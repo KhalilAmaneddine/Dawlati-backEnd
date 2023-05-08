@@ -20,7 +20,4 @@ public class Form {
     @Column(name = "FORM_NAME")
     private String formName;
 
-    public Form(Integer id) {
-        this.id = id;
-    }
 }

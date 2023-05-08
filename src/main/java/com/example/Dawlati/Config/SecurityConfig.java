@@ -47,7 +47,6 @@ public class SecurityConfig {
         AuthenticationEntryPoint entryPoint = new CustomAuthenticationEntryPoint();
         return http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/user/public").permitAll()
                         .requestMatchers("/api/v1/user/register").permitAll()
                         .requestMatchers("/api/v1/user/login").permitAll()
                         .requestMatchers("/api/v1/user/admin/**").hasAuthority("ROLE_ADMIN")

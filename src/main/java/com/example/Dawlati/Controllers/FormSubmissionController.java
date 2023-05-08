@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -25,15 +26,17 @@ public class FormSubmissionController {
     private final AuditService auditService;
     private final UserService userService;
     private final FormService formService;
-    @PostMapping("/save")
+    @PostMapping("/save/{id}")
     public ResponseEntity<FormSubmission> saveForm(@RequestBody FormSubmission formSubmission,
+                                                            @PathVariable("id") Integer id,
                                                             Authentication authentication) {
-        //Form form = formService.findById(formSubmission.getForm().getId());Send the formName with the JSON
+        Form form = formService.findById(id);
         User user = userService.findByEmail(authentication.getName());
         formSubmission.setDate(LocalDate.now());
         formSubmission.setUser(user);
+        formSubmission.setForm(form);
         AuditLog auditLog = new AuditLog(LocalDateTime.now(), "User " + authentication.getName()
-                + " saved a " + formSubmission.getForm().getFormName() + " extract draft", "Save", user);
+                + " saved a " + form.getFormName() + " extract draft", "Save", user);
         auditService.add(auditLog);
         try {
             FormSubmission formSubmission1 = formSubmissionService.getSavedExtract(user,
@@ -47,15 +50,17 @@ public class FormSubmissionController {
     }
 
 
-    @PostMapping("/submit")
+    @PostMapping("/submit/{id}")
     public ResponseEntity<FormSubmission> submitForm(@RequestBody FormSubmission formSubmission,
-                                                   Authentication authentication) {
-        //Form form = formService.findById(formSubmission.getForm().getId());Send the formName with the JSON
+            @PathVariable("id") Integer id,
+            Authentication authentication) {
+        Form form = formService.findById(id);
         User user = userService.findByEmail(authentication.getName());
         formSubmission.setDate(LocalDate.now());
         formSubmission.setUser(user);
+        formSubmission.setForm(form);
         AuditLog auditLog = new AuditLog(LocalDateTime.now(), "User " + authentication.getName()
-                + " submitted a " + formSubmission.getForm().getFormName() + " extract draft",
+                + " submitted a " + form.getFormName() + " extract draft",
                 "Submit", user);
         auditService.add(auditLog);
         try {
@@ -108,7 +113,7 @@ public class FormSubmissionController {
     }
 
     @GetMapping("/history/{id}")
-    public ResponseEntity<List<FormSubmissionDTO>> getHistory(@PathVariable("id") Integer id,
+    public ResponseEntity<List<String>> getHistory(@PathVariable("id") Integer id,
             Authentication authentication) {
         User user = userService.findByEmail(authentication.getName());
         Form form = formService.findById(id);
@@ -118,14 +123,13 @@ public class FormSubmissionController {
         auditService.add(auditLog);
         List<FormSubmission> formSubmissions = formSubmissionService.getHistory(user, form);
         //List<String> formData = new ArrayList<>();
-        List<FormSubmissionDTO> formSubmissionDTOS = new ArrayList<>();
+        List<String> formSubmissionData = new ArrayList<>();
         for(int i = 0; i < formSubmissions.size(); i++) {
             if(formSubmissions.get(i).getStatus() == Status.SUBMITTED)
                 //formData.add(formSubmissions.get(i).getFormData());
-                formSubmissionDTOS.add(new FormSubmissionDTO(formSubmissions.get(i).getFormData(),
-                        formSubmissions.get(i).getDate()));
+                formSubmissionData.add(formSubmissions.get(i).getFormData());
         }
 
-        return ResponseEntity.ok(formSubmissionDTOS);
+        return ResponseEntity.ok(formSubmissionData);
     }
 }

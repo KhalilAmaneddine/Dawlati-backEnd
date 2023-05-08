@@ -30,15 +30,6 @@ public class UserController {
     private final AuthService authService;
     private final AuditService auditService;
     private final FormSubmissionService formSubmissionService;
-    @GetMapping("/public")
-    public ResponseEntity<String> publicHello() {
-        return ResponseEntity.ok("PUBLIC");
-    }
-
-    @GetMapping("/private")
-    public ResponseEntity<String> privateHello() {
-        return ResponseEntity.ok("PRIVATE");
-    }
 
     @PostMapping("/register")
     public ResponseEntity<User> register(@RequestBody User user) {
