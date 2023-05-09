@@ -29,9 +29,9 @@ public class AttachmentController {
     private UserService userService;
     @Autowired
     private AuditService auditService;
-    private final String path = "C:/Users/Admin/Desktop/ProjectImages";
+    private final String path = "C:/Users/Admin/Desktop/DawlatiAttachments";
     @PostMapping("/civil")
-    public ResponseEntity<String> uploadCivil(@RequestParam("document") MultipartFile file,
+    public ResponseEntity<String> uploadCivil(@RequestParam("file") MultipartFile file,
                                               Authentication authentication) throws IOException {
         User user = userService.findByEmail(authentication.getName());
         Form form = new Form(1, "Civil Extract");
@@ -45,7 +45,7 @@ public class AttachmentController {
     }
 
     @PostMapping("/judicial")
-    public ResponseEntity<String> uploadJudicial(@RequestParam("document") MultipartFile file,
+    public ResponseEntity<String> uploadJudicial(@RequestParam("file") MultipartFile file,
                                               Authentication authentication) throws IOException {
         User user = userService.findByEmail(authentication.getName());
         Form form = new Form(2, "Judicial Extract of Records");
