@@ -1,9 +1,6 @@
 package com.example.Dawlati.Controllers;
 
-import com.example.Dawlati.Models.AuditLog;
-import com.example.Dawlati.Models.Role;
-import com.example.Dawlati.Models.User;
-import com.example.Dawlati.Models.UserDTO;
+import com.example.Dawlati.Models.*;
 import com.example.Dawlati.Services.AuditService;
 import com.example.Dawlati.Services.AuthService;
 import com.example.Dawlati.Services.FormSubmissionService;
@@ -53,13 +50,7 @@ public class UserController {
 
     @GetMapping("/admin/getUsers")
     public ResponseEntity<List<UserDTO>> getUsers() {
-        List<UserDTO> users = new ArrayList<>();
-        List<User> newUsers = userService.getUsers();
-        for(int i = 0; i < newUsers.size(); i++) {
-            users.add(new UserDTO(newUsers.get(i).getId(), newUsers.get(i).getEmail(),
-                    newUsers.get(i).getFirstname(), newUsers.get(i).getLastname())) ;
-        }
-        return ResponseEntity.ok(users);
+        return ResponseEntity.ok(userService.getUsers());
     }
 
     @Transactional
@@ -69,5 +60,22 @@ public class UserController {
         auditService.deleteByUser(user);
         formSubmissionService.deleteByUser(user);
         userService.deleteUser(user.getId());
+    }
+
+    /*@Transactional
+    @DeleteMapping("/admin/deleteUser/{email}")
+    public void deleteUser(@PathVariable("email") String email) {
+        userService.deleteUser(email);
+    }*/
+    @GetMapping("/admin/getData")
+    public ResponseEntity<List<FormSubmission>> getData() {
+        return ResponseEntity.ok(this.formSubmissionService.getData());
+    }
+
+    @PostMapping("/admin/approve")
+    public ResponseEntity<String> approveForm(@RequestBody FormSubmission formSubmission) {
+        formSubmission.setStatus(Status.APPROVED);
+        this.formSubmissionService.approveForm(formSubmission);
+        return ResponseEntity.ok("Form approved");
     }
 }

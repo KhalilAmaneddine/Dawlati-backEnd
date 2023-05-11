@@ -2,8 +2,10 @@ package com.example.Dawlati;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
+@EnableScheduling
 public class DawlatiApplication {
 
 	public static void main(String[] args) {
@@ -15,3 +17,4 @@ public class DawlatiApplication {
 
 //cd C:\Program Files (x86)\Google\Chrome\Application
 //chrome.exe --disable-web-security --disable-gpu --user-data-dir=~/chromeTemp
+//dawlati_portal1

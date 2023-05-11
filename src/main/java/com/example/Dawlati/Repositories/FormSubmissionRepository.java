@@ -16,4 +16,8 @@ public interface FormSubmissionRepository extends JpaRepository<FormSubmission, 
     List<FormSubmission> findByUserAndForm(User user, Form form);
 
     void deleteByUser(User user);
+
+    List<FormSubmission> findByUser(User user);
+
+    List<FormSubmission> findByStatus(Status status);
 }

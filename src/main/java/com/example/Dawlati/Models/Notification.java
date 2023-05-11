@@ -20,8 +20,11 @@ public class Notification {
     @Column(name = "NOTIFICATION_TYPE")
     private NotificationType notificationType;
 
-    @Column(name = "Message")
+    @Column(name = "MESSAGE")
     private String message;
+
+    @Column(name = "SUBJECT")
+    private String subject;
 
     @Column(name = "TIMESTAMP")
     private LocalDateTime timestamp;
@@ -30,9 +33,19 @@ public class Notification {
     private Integer retryCount;
 
     @Column(name = "IS_SENT")
-    private Boolean isSent;
+    private Integer isSent;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "USER_ID")
     private User user;
+
+    public Notification(String message, String subject, LocalDateTime timestamp, Integer retryCount,
+                        Integer isSent, User user) {
+        this.message = message;
+        this.subject = subject;
+        this.timestamp = timestamp;
+        this.retryCount = retryCount;
+        this.isSent = isSent;
+        this.user = user;
+    }
 }

@@ -25,36 +25,19 @@ public class AttachmentController {
 
     @Autowired
     private AttachmentService attachmentService;
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private AuditService auditService;
-    private final String path = "C:/Users/Admin/Desktop/DawlatiAttachments";
+
+
     @PostMapping("/civil")
     public ResponseEntity<String> uploadCivil(@RequestParam("file") MultipartFile file,
                                               Authentication authentication) throws IOException {
-        User user = userService.findByEmail(authentication.getName());
         Form form = new Form(1, "Civil Extract");
-        AuditLog auditLog = new AuditLog(LocalDateTime.now(), "User " + authentication.getName()
-                + " uploaded a Civil extract attachment", "Upload", user);
-        auditService.add(auditLog);
-        String filePath = path + "/" + file.getOriginalFilename();
-        Attachment attachment = new Attachment(filePath, form, user);
-        file.transferTo(new java.io.File(filePath));
-        return ResponseEntity.ok(attachmentService.uploadAttachment(attachment));
+        return ResponseEntity.ok(attachmentService.uploadAttachment(file, authentication, form));
     }
 
     @PostMapping("/judicial")
     public ResponseEntity<String> uploadJudicial(@RequestParam("file") MultipartFile file,
                                               Authentication authentication) throws IOException {
-        User user = userService.findByEmail(authentication.getName());
         Form form = new Form(2, "Judicial Extract of Records");
-        AuditLog auditLog = new AuditLog(LocalDateTime.now(), "User " + authentication.getName()
-                + " uploaded a Judicial extract attachment", "Upload", user);
-        auditService.add(auditLog);
-        String filePath = path + "/" + file.getOriginalFilename();
-        Attachment attachment = new Attachment(filePath, form, user);
-        file.transferTo(new java.io.File(filePath));
-        return ResponseEntity.ok(attachmentService.uploadAttachment(attachment));
+        return ResponseEntity.ok(attachmentService.uploadAttachment(file, authentication, form));
     }
 }

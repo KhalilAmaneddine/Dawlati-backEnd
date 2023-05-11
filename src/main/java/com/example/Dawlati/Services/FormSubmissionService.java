@@ -1,13 +1,14 @@
 package com.example.Dawlati.Services;
 
-import com.example.Dawlati.Models.Form;
-import com.example.Dawlati.Models.FormSubmission;
-import com.example.Dawlati.Models.Status;
-import com.example.Dawlati.Models.User;
+import com.example.Dawlati.Models.*;
 import com.example.Dawlati.Repositories.FormSubmissionRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,24 +16,131 @@ import java.util.Optional;
 @AllArgsConstructor
 public class FormSubmissionService {
     private final FormSubmissionRepository formSubmissionRepository;
-    public FormSubmission getSavedExtract(User user, Form form, Status status) {
-        return formSubmissionRepository.findByUserAndFormAndStatus(user,form, status)
-                .orElseThrow( () -> new IllegalStateException("No saved data"));
+    private final NotificationService notificationService;
+    private final FormService formService;
+    private final UserService userService;
+    private final AuditService auditService;
+
+
+    public String getSavedExtract(Integer id, Authentication authentication) {
+        User user = userService.findByEmail(authentication.getName());
+        Form form = formService.findById(id);
+        try {
+            FormSubmission formSubmission =
+                    formSubmissionRepository.findByUserAndFormAndStatus(user, form, Status.PENDING)
+                            .orElseThrow(() -> new IllegalStateException("No data found"));
+            return formSubmission.getFormData();
+        } catch(Exception e) {
+            return "No data available";
+        }
     }
 
-    public FormSubmission saveForm(FormSubmission formSubmission) {
+    public FormSubmission saveForm(FormSubmission formSubmission, Integer id, Authentication authentication) {
+        Form form = formService.findById(id);
+        User user = userService.findByEmail(authentication.getName());
+        formSubmission.setDate(LocalDate.now());
+        formSubmission.setUser(user);
+        formSubmission.setForm(form);
+        AuditLog auditLog = new AuditLog(LocalDateTime.now(), "User " + authentication.getName()
+                + " saved a " + form.getFormName() + " extract draft", "Save", user);
+        auditService.add(auditLog);
+
+        try {
+            FormSubmission formSubmission1 =
+                    formSubmissionRepository.findByUserAndFormAndStatus(user,form, Status.PENDING)
+                    .orElseThrow( () -> new IllegalStateException("No saved data"));
+                    formSubmission.setId(formSubmission1.getId());
+        } catch (Exception e) {
+
+        }
         return formSubmissionRepository.save(formSubmission);
     }
 
-    public void deleteExtract(FormSubmission formSubmission) {
-        formSubmissionRepository.deleteById(formSubmission.getId());
+    public FormSubmission approveForm(FormSubmission formSubmission) {
+        Notification notification = new Notification("Your form has been approved", "Approval",
+                LocalDateTime.now(),
+                0, 0, formSubmission.getUser());
+        notificationService.save(notification);
+        return formSubmissionRepository.save(formSubmission);
     }
 
-    public List<FormSubmission> getHistory(User user, Form form) {
-        return formSubmissionRepository.findByUserAndForm(user, form);
+
+    public void deleteExtract(Integer id, Authentication authentication) {
+        User user = userService.findByEmail(authentication.getName());
+        Form form = formService.findById(id);
+        AuditLog auditLog = new AuditLog(LocalDateTime.now(),
+                "User " + authentication.getName()
+                        + " deleted a " + form.getFormName() +" extract draft", "Delete", user);
+        auditService.add(auditLog);
+
+        try {
+            FormSubmission formSubmission =
+                    formSubmissionRepository.findByUserAndFormAndStatus(user,form, Status.PENDING)
+                    .orElseThrow( () -> new IllegalStateException("No saved data"));
+                    formSubmissionRepository.deleteById(formSubmission.getId());
+        } catch(Exception e) {
+
+        }
+    }
+
+
+    public List<String> getHistory(Integer id, Authentication authentication) {
+        User user = userService.findByEmail(authentication.getName());
+        Form form = formService.findById(id);
+        AuditLog auditLog = new AuditLog(LocalDateTime.now(),
+                "User " + authentication.getName() + " viewed his " + form.getFormName()
+                        +" Extract History", "View", user);
+        auditService.add(auditLog);
+        List<FormSubmission> formSubmissions = formSubmissionRepository.findByUserAndForm(user, form);
+        List<String> formSubmissionData = new ArrayList<>();
+        for(int i = 0; i < formSubmissions.size(); i++) {
+            if(formSubmissions.get(i).getStatus() == Status.SUBMITTED)
+                formSubmissionData.add(formSubmissions.get(i).getFormData());
+        }
+        return formSubmissionData;
     }
 
     public void deleteByUser(User user) {
         formSubmissionRepository.deleteByUser(user);
+    }
+
+
+    public List<FormSubmission> getData() {
+        return this.formSubmissionRepository.findByStatus(Status.SUBMITTED);
+    }
+
+
+    public FormSubmission submitForm(FormSubmission formSubmission, Integer id,
+                                     Authentication authentication) {
+        Form form = formService.findById(id);
+        User user = userService.findByEmail(authentication.getName());
+        formSubmission.setDate(LocalDate.now());
+        formSubmission.setUser(user);
+        formSubmission.setForm(form);
+        AuditLog auditLog = new AuditLog(LocalDateTime.now(), "User " + authentication.getName()
+                + " submitted a " + form.getFormName() + " extract draft",
+                "Submit", user);
+        auditService.add(auditLog);
+        Notification notification = new Notification("User submitted a form", "SUBMITTAL",
+                LocalDateTime.now(),
+                0, 0, formSubmission.getUser());
+        notificationService.save(notification);
+        try {
+            FormSubmission formSubmission1 =
+                    formSubmissionRepository.findByUserAndFormAndStatus(user,form, Status.PENDING)
+                    .orElseThrow( () -> new IllegalStateException("No saved data"));
+
+            formSubmission.setId(formSubmission1.getId());
+        } catch(Exception e) {
+        }
+        return formSubmissionRepository.save(formSubmission);
+    }
+
+    public void printForm(String formName, Authentication authentication) {
+        User user = userService.findByEmail(authentication.getName());
+        AuditLog auditLog = new AuditLog(LocalDateTime.now(),
+                "User " + authentication.getName() + " printed a " + formName + " Extract",
+                "Print", user);
+        auditService.add(auditLog);
     }
 }
