@@ -47,15 +47,5 @@ public class UserService implements UserDetailsService {
         return users;
     }
 
-    public void deleteUser(Integer id) {
-        userRepository.deleteById(id);
-    }
 
-    /*public void deleteUser(String email) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalStateException("User not found"));
-        auditService.deleteByUser(user);
-        formSubmissionService.deleteByUser(user);
-        userRepository.deleteById(user.getId());
-    }*/
 }

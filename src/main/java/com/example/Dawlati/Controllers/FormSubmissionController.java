@@ -21,24 +21,19 @@ public class FormSubmissionController {
     private final AuditService auditService;
     private final UserService userService;
 
-
-    @PostMapping("/save/{id}")
+    @PostMapping("/save")
     public ResponseEntity<FormSubmission> saveForm(@RequestBody FormSubmission formSubmission,
-                                                   @PathVariable("id") Integer id,
                                                    Authentication authentication) {
-        return new ResponseEntity<>(this.formSubmissionService.saveForm(formSubmission, id, authentication),
+        return new ResponseEntity<>(this.formSubmissionService.saveForm(formSubmission, authentication),
                 HttpStatus.CREATED);
     }
 
-
-    @PostMapping("/submit/{id}")
+    @PostMapping("/submit")
     public ResponseEntity<FormSubmission> submitForm(@RequestBody FormSubmission formSubmission,
-                                                     @PathVariable("id") Integer id,
                                                      Authentication authentication) {
-        return new ResponseEntity<>(this.formSubmissionService.submitForm(formSubmission, id, authentication),
+        return new ResponseEntity<>(this.formSubmissionService.submitForm(formSubmission, authentication),
                 HttpStatus.CREATED);
     }
-
    @GetMapping("/getSavedData/{id}")
    public ResponseEntity<String> getSavedData(@PathVariable("id") Integer id,
                                               Authentication authentication) {

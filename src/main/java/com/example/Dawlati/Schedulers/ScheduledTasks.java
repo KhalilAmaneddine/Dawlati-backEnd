@@ -18,13 +18,16 @@ import java.util.List;
 public class ScheduledTasks {
     private static final Logger log = LoggerFactory.getLogger(ScheduledTasks.class);
     private final EmailSenderService emailSenderService;
-
+    private String emailTo;
     private final NotificationService notificationService;
     @Scheduled(fixedRate = 10000)
     public void checkNotifications() {
         List<Notification> notifications = this.notificationService.findNotSentNotifications();
         for (int i = 0; i < notifications.size(); i++) {
-            emailSenderService.sendEmail(notifications.get(i).getUser().getEmail(),
+                this.emailTo = "jakedoe@gmail.com";
+            if (notifications.get(i).getSubject() == "APPROVAL")
+                this.emailTo = notifications.get(i).getUser().getEmail();
+            emailSenderService.sendEmail(this.emailTo,
                     notifications.get(i).getSubject(), notifications.get(i).getMessage());
             notifications.get(i).setIsSent(1);
             this.notificationService.updateIsSet(notifications.get(i));

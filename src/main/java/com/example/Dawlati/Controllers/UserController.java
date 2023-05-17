@@ -53,20 +53,7 @@ public class UserController {
         return ResponseEntity.ok(userService.getUsers());
     }
 
-    @Transactional
-    @DeleteMapping("/admin/deleteUser/{email}")
-    public void deleteUser(@PathVariable("email") String email) {
-        User user = userService.findByEmail(email);
-        auditService.deleteByUser(user);
-        formSubmissionService.deleteByUser(user);
-        userService.deleteUser(user.getId());
-    }
 
-    /*@Transactional
-    @DeleteMapping("/admin/deleteUser/{email}")
-    public void deleteUser(@PathVariable("email") String email) {
-        userService.deleteUser(email);
-    }*/
     @GetMapping("/admin/getData")
     public ResponseEntity<List<FormSubmission>> getData() {
         return ResponseEntity.ok(this.formSubmissionService.getData());

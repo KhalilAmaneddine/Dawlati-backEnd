@@ -39,8 +39,9 @@ public class Notification {
     @JoinColumn(name = "USER_ID")
     private User user;
 
-    public Notification(String message, String subject, LocalDateTime timestamp, Integer retryCount,
-                        Integer isSent, User user) {
+    public Notification( NotificationType notificationType,String message, String subject, LocalDateTime timestamp,
+                         Integer retryCount, Integer isSent, User user) {
+        this.notificationType = notificationType;
         this.message = message;
         this.subject = subject;
         this.timestamp = timestamp;
