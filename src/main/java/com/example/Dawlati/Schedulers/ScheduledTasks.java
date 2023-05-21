@@ -25,8 +25,10 @@ public class ScheduledTasks {
         List<Notification> notifications = this.notificationService.findNotSentNotifications();
         for (int i = 0; i < notifications.size(); i++) {
                 this.emailTo = "jakedoe@gmail.com";
-            if (notifications.get(i).getSubject() == "APPROVAL")
+            if (notifications.get(i).getSubject().equals("Approval")) {
                 this.emailTo = notifications.get(i).getUser().getEmail();
+                System.out.println(notifications.get(i).getUser().getEmail());
+            }
             emailSenderService.sendEmail(this.emailTo,
                     notifications.get(i).getSubject(), notifications.get(i).getMessage());
             notifications.get(i).setIsSent(1);

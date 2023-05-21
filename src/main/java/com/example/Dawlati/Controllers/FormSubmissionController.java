@@ -53,10 +53,15 @@ public class FormSubmissionController {
         formSubmissionService.printForm(formName, authentication);
     }
 
-    @GetMapping("/history/{id}")
+    /*@GetMapping("/history/{id}")
     public ResponseEntity<List<String>> getHistory(@PathVariable("id") Integer id,
                                                    Authentication authentication) {
-
+        return ResponseEntity.ok(formSubmissionService.getHistory(id, authentication));
+    }*/
+    @GetMapping("/history/{id}")
+    public ResponseEntity<List<FormSubmission>> getHistory(@PathVariable("id") Integer id,
+                                                   Authentication authentication) {
         return ResponseEntity.ok(formSubmissionService.getHistory(id, authentication));
     }
+
 }

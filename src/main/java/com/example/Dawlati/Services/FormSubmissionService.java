@@ -23,11 +23,9 @@ public class FormSubmissionService {
 
 
     public String getSavedExtract(Integer id, Authentication authentication) {
-        User user = userService.findByEmail(authentication.getName());
-        Form form = formService.findById(id);
         try {
             FormSubmission formSubmission =
-                    formSubmissionRepository.findByUserAndFormAndStatus(user, form, Status.PENDING)
+                    formSubmissionRepository.findByIdAndStatus(id, Status.PENDING)
                             .orElseThrow(() -> new IllegalStateException("No data found"));
             return formSubmission.getFormData();
         } catch(Exception e) {
@@ -42,24 +40,18 @@ public class FormSubmissionService {
         AuditLog auditLog = new AuditLog(LocalDateTime.now(), "User " + authentication.getName()
                 + " saved a " + formSubmission.getForm().getFormName() + " extract draft", "Save", user);
         auditService.add(auditLog);
-
-        try {
-            FormSubmission formSubmission1 =
-                    formSubmissionRepository.findByUserAndFormAndStatus(user,formSubmission.getForm(),
-                                    Status.PENDING)
-                            .orElseThrow( () -> new IllegalStateException("No saved data"));
-            formSubmission.setId(formSubmission1.getId());
-        } catch (Exception e) {
-
-        }
         return formSubmissionRepository.save(formSubmission);
     }
 
     public FormSubmission approveForm(FormSubmission formSubmission) {
+        FormSubmission formSubmission1 = this.formSubmissionRepository.findById(formSubmission.getId())
+                .orElseThrow(() -> new IllegalStateException("No form found"));
+        User user = formSubmission1.getUser();
         Notification notification = new Notification(NotificationType.EMAIL, "Your form has been approved", "Approval",
                 LocalDateTime.now(),
-                0, 0, formSubmission.getUser());
+                0, 0, user);
         notificationService.save(notification);
+        formSubmission.setUser(user);
         return formSubmissionRepository.save(formSubmission);
     }
 
@@ -82,8 +74,7 @@ public class FormSubmissionService {
         }
     }
 
-
-    public List<String> getHistory(Integer id, Authentication authentication) {
+    public List<FormSubmission> getHistory(Integer id, Authentication authentication) {
         User user = userService.findByEmail(authentication.getName());
         Form form = formService.findById(id);
         AuditLog auditLog = new AuditLog(LocalDateTime.now(),
@@ -91,21 +82,12 @@ public class FormSubmissionService {
                         +" Extract History", "View", user);
         auditService.add(auditLog);
         List<FormSubmission> formSubmissions = formSubmissionRepository.findByUserAndForm(user, form);
-        List<String> formSubmissionData = new ArrayList<>();
-        for(int i = 0; i < formSubmissions.size(); i++) {
-            if(formSubmissions.get(i).getStatus() == Status.SUBMITTED)
-                formSubmissionData.add(formSubmissions.get(i).getFormData());
-        }
-        return formSubmissionData;
+        return formSubmissions;
     }
 
-    public void deleteByUser(User user) {
-        formSubmissionRepository.deleteByUser(user);
-    }
-
-
-    public List<FormSubmission> getData() {
-        return this.formSubmissionRepository.findByStatus(Status.SUBMITTED);
+    public List<FormSubmission> getData(Integer id) {
+        Form form = formService.findById(id);
+        return this.formSubmissionRepository.findByStatusAndForm(Status.SUBMITTED, form);
     }
 
     public FormSubmission submitForm(FormSubmission formSubmission,
@@ -122,15 +104,6 @@ public class FormSubmissionService {
                 LocalDateTime.now(),
                 0, 0, formSubmission.getUser());
         notificationService.save(notification);
-        try {
-            FormSubmission formSubmission1 =
-                    formSubmissionRepository.findByUserAndFormAndStatus(user,formSubmission.getForm(),
-                                    Status.PENDING)
-                            .orElseThrow( () -> new IllegalStateException("No saved data"));
-
-            formSubmission.setId(formSubmission1.getId());
-        } catch(Exception e) {
-        }
         return formSubmissionRepository.save(formSubmission);
     }
 

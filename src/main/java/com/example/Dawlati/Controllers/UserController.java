@@ -54,9 +54,9 @@ public class UserController {
     }
 
 
-    @GetMapping("/admin/getData")
-    public ResponseEntity<List<FormSubmission>> getData() {
-        return ResponseEntity.ok(this.formSubmissionService.getData());
+    @GetMapping("/admin/getData/{id}")
+    public ResponseEntity<List<FormSubmission>> getData(@PathVariable("id") Integer id) {
+        return ResponseEntity.ok(this.formSubmissionService.getData(id));
     }
 
     @PostMapping("/admin/approve")
