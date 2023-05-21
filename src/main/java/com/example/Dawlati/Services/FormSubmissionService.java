@@ -87,7 +87,7 @@ public class FormSubmissionService {
 
     public List<FormSubmission> getData(Integer id) {
         Form form = formService.findById(id);
-        return this.formSubmissionRepository.findByStatusAndForm(Status.SUBMITTED, form);
+        return this.formSubmissionRepository.findByStatusAndForgitm(Status.SUBMITTED, form);
     }
 
     public FormSubmission submitForm(FormSubmission formSubmission,
