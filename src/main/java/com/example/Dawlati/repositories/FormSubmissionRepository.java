@@ -12,9 +12,7 @@ import java.util.Optional;
 public interface FormSubmissionRepository extends JpaRepository<FormSubmission, Integer> {
 
 
-
     List<FormSubmission> findByUserAndForm(User user, Form form);
-
 
     Optional<FormSubmission> findByIdAndStatus(Integer id, Status status);
 

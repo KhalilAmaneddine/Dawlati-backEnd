@@ -1,5 +1,6 @@
 package com.example.Dawlati.annotations;
 
+import com.example.Dawlati.exceptions.UserEmailNotFoundException;
 import com.example.Dawlati.models.AuditLog;
 import com.example.Dawlati.models.User;
 import com.example.Dawlati.repositories.UserRepository;
@@ -26,7 +27,7 @@ public class AuditAspect {
     public void logAudit(JoinPoint joinPoint, Audit audit) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = userRepository.findByEmail(authentication.getName())
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                .orElseThrow(() -> new UserEmailNotFoundException("User not found"));
         AuditLog auditLog = new AuditLog(LocalDateTime.now(), audit.details(), audit.action(), user);
         auditService.add(auditLog);
     }

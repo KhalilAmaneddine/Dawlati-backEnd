@@ -5,7 +5,6 @@ import com.example.Dawlati.exceptions.FormSubmissionNotFoundException;
 import com.example.Dawlati.models.*;
 import com.example.Dawlati.repositories.FormSubmissionRepository;
 import lombok.AllArgsConstructor;
-import lombok.extern.log4j.Log4j;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -85,6 +84,6 @@ public class FormSubmissionService {
     }
 
     @Audit(action = AuditLogAction.Print, details = "User printed a Form")
-    public void printForm(String formName, Authentication authentication) {
+    public void printForm() {
     }
 }

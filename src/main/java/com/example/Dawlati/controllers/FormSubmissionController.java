@@ -38,15 +38,14 @@ public class FormSubmissionController {
 
 
     @DeleteMapping("/deleteExtract/{id}")
-    public void deleteExtract(@PathVariable("id") Integer id, Authentication authentication) {
+    public void deleteExtract(@PathVariable("id") Integer id) {
         formSubmissionService.deleteExtract(id);
     }
 
 
     @PostMapping("/formPrinted")
-    public void auditPrint(@RequestBody String formName,
-                           Authentication authentication) {
-        formSubmissionService.printForm(formName, authentication);
+    public void auditPrint(@RequestBody String formName) {
+        formSubmissionService.printForm();
     }
 
     @GetMapping("/history/{id}")
@@ -54,5 +53,10 @@ public class FormSubmissionController {
                                                    Authentication authentication) {
         return ResponseEntity.ok(formSubmissionService.getHistory(id, authentication));
     }
+
+    /*@GetMapping("/hi")
+    public ResponseEntity<String> sayHi() {
+        return ResponseEntity.ok("Hi");
+    }*/
 
 }

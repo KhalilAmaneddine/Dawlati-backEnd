@@ -2,6 +2,7 @@ package com.example.Dawlati.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -11,6 +12,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Entity
 @Table(name = "form_submissions")
+@AllArgsConstructor
 public class FormSubmission {
 
     @Id
@@ -37,4 +39,11 @@ public class FormSubmission {
     @JsonIgnore
     private User user;
 
+    public FormSubmission(String formData, Status status, LocalDate date, Form form, User user) {
+        this.formData = formData;
+        this.status = status;
+        this.date = date;
+        this.form = form;
+        this.user = user;
+    }
 }
