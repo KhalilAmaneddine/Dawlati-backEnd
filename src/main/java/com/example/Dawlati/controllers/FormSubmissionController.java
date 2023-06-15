@@ -54,9 +54,6 @@ public class FormSubmissionController {
         return ResponseEntity.ok(formSubmissionService.getHistory(id, authentication));
     }
 
-    /*@GetMapping("/hi")
-    public ResponseEntity<String> sayHi() {
-        return ResponseEntity.ok("Hi");
-    }*/
+
 
 }
